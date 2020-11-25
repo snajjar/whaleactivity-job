@@ -1,0 +1,10 @@
+{
+  "name": "stakepool-jobs",
+  "version": "1.0.0",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "lodash": "^4.17.20",
+    "moment": "^2.29.1",
+    "mongoose": "^5.10.16"
+  }
+}
