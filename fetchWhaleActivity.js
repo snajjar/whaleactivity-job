@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const mongoose = require("mongoose");
 const axios = require("axios");
 const moment = require("moment");
@@ -161,7 +163,7 @@ const handleDataFetching = async () => {
         await saveWhaleData(transactions);
         lastTimestampFetched = lastTimestampFetched.add(10, "minutes");
         console.log("fetching again in 6s");
-        setTimeout(handleDataFetching, 6 * 1000); // 6s timeout
+        setTimeout(handleDataFetching, 10 * 1000); // 10s timeout
     } else {
         console.log("fetching again in 20m");
         setTimeout(handleDataFetching, 20 * 60 * 1000); // 20min timeout
