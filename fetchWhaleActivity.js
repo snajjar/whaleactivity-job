@@ -156,15 +156,15 @@ const handleDataFetching = async () => {
     }
 
     // if last fetch was more than 10 minutes ago
-    if (now - lastTimestampFetched > 10 * 60 * 1000) {
+    if (now - lastTimestampFetched > 20 * 60 * 1000) {
         let transactions = await fetchWhaleData(lastTimestampFetched);
         await saveWhaleData(transactions);
         lastTimestampFetched = lastTimestampFetched.add(10, "minutes");
         console.log("fetching again in 6s");
         setTimeout(handleDataFetching, 6 * 1000); // 6s timeout
     } else {
-        console.log("fetching again in 10m");
-        setTimeout(handleDataFetching, 10 * 60 * 1000); // 10min timeout
+        console.log("fetching again in 20m");
+        setTimeout(handleDataFetching, 20 * 60 * 1000); // 20min timeout
     }
 };
 
