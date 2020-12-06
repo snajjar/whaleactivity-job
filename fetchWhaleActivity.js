@@ -41,27 +41,71 @@ const dbConnect = () => {
 const Schema = mongoose.Schema;
 const WhaleActivitySchema = new Schema({
     // DETAILS
-    hash: { type: String, required: true, index: { unique: true } },
-    bockchain: { type: String, required: true },
-    symbol: { type: String, required: true },
-    transactionType: { type: String, required: true },
-    timestamp: { type: Number, required: true },
-    amount: { type: Number, required: true },
-    amountUSD: { type: Number, required: true },
+    hash: {
+        type: String,
+        required: true,
+        index: {
+            unique: true
+        }
+    },
+    bockchain: {
+        type: String,
+        required: true
+    },
+    symbol: {
+        type: String,
+        required: true
+    },
+    transactionType: {
+        type: String,
+        required: true
+    },
+    timestamp: {
+        type: Number,
+        required: true
+    },
+    amount: {
+        type: Number,
+        required: true
+    },
+    amountUSD: {
+        type: Number,
+        required: true
+    },
 
     // FROM
-    fromAddress: { type: String, required: true },
-    fromOwner: { type: String },
-    fromOwnerType: { type: String, required: true },
+    fromAddress: {
+        type: String,
+        required: true
+    },
+    fromOwner: {
+        type: String
+    },
+    fromOwnerType: {
+        type: String,
+        required: true
+    },
 
     // TO
-    toAddress: { type: String, required: true },
-    toOwner: { type: String },
-    toOwnerType: { type: String, required: true },
+    toAddress: {
+        type: String,
+        required: true
+    },
+    toOwner: {
+        type: String
+    },
+    toOwnerType: {
+        type: String,
+        required: true
+    },
 });
 
 // document expires after 15 days
-WhaleActivitySchema.index({ createdAt: 1 }, { expireAfterSeconds: 15 * 24 * 60 * 60 });
+WhaleActivitySchema.index({
+    createdAt: 1
+}, {
+    expireAfterSeconds: 15 * 24 * 60 * 60
+});
 const WhaleActivity = mongoose.model('WhaleActivity', WhaleActivitySchema);
 
 
@@ -95,20 +139,26 @@ const fetchWhaleData = async (start) => {
     let cursor = null;
     do {
         let cursorUrl = cursor === null ? url : url + `&cursor=${cursor}`;
-        let response = await axios.get(cursorUrl);
-        let result = _.get(response, ["data", "result"]);
-        if (result === "success") {
-            let data = response.data;
-            transactions = transactions.concat(data.transactions || []);
+        try {
+            let response = await axios.get(cursorUrl);
+            let result = _.get(response, ["data", "result"]);
+            if (result === "success") {
+                let data = response.data;
+                transactions = transactions.concat(data.transactions || []);
 
-            if (data.cursor && data.cursor != cursor) {
-                cursor = data.cursor;
-                await sleep(6);
+                if (data.cursor && data.cursor != cursor) {
+                    cursor = data.cursor;
+                    await sleep(6);
+                } else {
+                    cursor = null;
+                }
             } else {
-                cursor = null;
+                console.error(result.data);
             }
-        } else {
-            console.error(result.data);
+        } catch (e) {
+            console.error('Caught error:' + e);
+            console.log('waiting 5 min');
+            await sleep(5 * 50);
         }
     } while (cursor !== null);
 
@@ -118,7 +168,9 @@ const fetchWhaleData = async (start) => {
 
 const saveWhaleData = async (transactions) => {
     for (let t of transactions) {
-        let existingActivity = await WhaleActivity.findOne({ hash: t.hash });
+        let existingActivity = await WhaleActivity.findOne({
+            hash: t.hash
+        });
         if (!existingActivity) {
             try {
                 let activity = new WhaleActivity({
